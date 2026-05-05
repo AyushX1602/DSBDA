@@ -1,0 +1,48 @@
+import pandas as pd
+import numpy as np
+
+# Column names
+col_names = ['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width','Species']
+
+# Load dataset (from your zip)
+df = pd.read_csv('iris.csv', names=col_names)
+
+
+# Basic Information
+print(df.head())      # first 5 rows
+print(df.shape)       # number of rows and columns
+print(df.columns)     # column names
+print(df.dtypes)      # data types
+
+
+# Summary Statistics
+print(df.describe())  # mean, std, min, max, etc.
+
+
+# Unique Values
+print(df['Species'].unique())
+
+
+# Group-wise Statistics
+print(df.groupby('Species').mean(numeric_only=True))   # mean for numeric columns
+
+# multiple statistics
+numeric_cols = ['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width']
+df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors='coerce')
+
+print(df.groupby('Species')[numeric_cols].agg(['mean','median','min','max','std']))
+
+
+# Separate Data (kept but reduced usage)
+setosa = df[df['Species'] == 'Iris-setosa']
+versicolor = df[df['Species'] == 'Iris-versicolor']
+virginica = df[df['Species'] == 'Iris-virginica']
+
+# describe each (optional but kept for exam)
+print(setosa.describe())
+print(versicolor.describe())
+print(virginica.describe())
+
+
+# Save dataset
+df.to_csv("iris_dataset.csv", index=False)

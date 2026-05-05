@@ -1,0 +1,42 @@
+# ASSIGNMENT 1 - DATA WRANGLING I
+
+
+# STEP 1: Import Libraries
+import pandas as pd
+import numpy as np
+from sklearn import preprocessing
+
+# STEP 2: Load Dataset
+df = pd.read_csv("titanic.csv")
+print(df.head())
+
+# STEP 3: Data Preprocessing
+print(df.shape)                      # dimensions
+print(df.describe())                 # statistics
+print(df.isnull().sum())             # missing values
+df["Age"]      = df["Age"].fillna(df["Age"].median())
+df["Cabin"]    = df["Cabin"].fillna("Unknown")
+df["Embarked"] = df["Embarked"].fillna(df["Embarked"].mode()[0])
+
+# STEP 4: Data Types + Conversion
+print(df.dtypes)
+df["Age"] = df["Age"].astype("int64")
+
+# STEP 5: Normalization (Min-Max)
+cols = ["Age", "Fare", "SibSp", "Parch"]
+df[cols] = preprocessing.MinMaxScaler().fit_transform(df[cols])
+print(df[cols].head())
+
+# STEP 6: Categorical to Quantitative
+# Label Encoding - Sex
+df["Sex"] = preprocessing.LabelEncoder().fit_transform(df["Sex"])
+
+# One-Hot Encoding - Embarked
+df = pd.get_dummies(df, columns=["Embarked"], prefix="Emb", dtype=int)
+
+# Dummy Encoding - Pclass
+df = pd.get_dummies(df, columns=["Pclass"], prefix="Pclass", drop_first=True, dtype=int)
+
+print(df.head())
+df.to_csv("titanic_cleaned.csv", index=False)
+print("Done!")

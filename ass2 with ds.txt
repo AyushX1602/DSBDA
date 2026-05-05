@@ -1,0 +1,60 @@
+# ASSIGNMENT 2 - DATA WRANGLING II
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# Load Dataset
+df = pd.read_csv("studentperformance.csv")
+print(df.head())
+print(df.describe())
+
+# TASK 1: Missing Values
+print(df.isnull().sum())
+df.fillna(df.median(numeric_only=True), inplace=True)
+
+# Inconsistencies - clip to valid range
+df["math"]                  = df["math"].clip(60, 80)
+df["reading"]               = df["reading"].clip(75, 95)
+df["writing"]               = df["writing"].clip(60, 80)
+df["placement"]             = df["placement"].clip(75, 100)
+df["placement_offer_count"] = df["placement_offer_count"].clip(1, 3)
+df["club_join_date"]        = df["club_join_date"].clip(2018, 2021)
+print("Inconsistencies fixed!")
+
+# TASK 2: Outliers
+num_cols = df.select_dtypes(include=np.number).columns
+
+# Boxplot
+df[num_cols].boxplot(); plt.title("Boxplot"); plt.show()
+
+# IQR - detect and fix
+for col in num_cols:
+    Q1, Q3, IQR = df[col].quantile(.25), df[col].quantile(.75), df[col].quantile(.75)-df[col].quantile(.25)
+    lo, hi = Q1-1.5*IQR, Q3+1.5*IQR
+    out = ((df[col]<lo)|(df[col]>hi)).sum()
+    df[col] = df[col].apply(lambda x: df[col].median() if x<lo or x>hi else x)
+    print(f"{col}: IQR={IQR}, Lower={lo:.1f}, Upper={hi:.1f}, Outliers={out}")
+
+# Z-Score
+for col in num_cols:
+    print(f"{col} Z-outliers: {(np.abs(stats.zscore(df[col]))>2).sum()}")
+
+# TASK 3: Transformation
+# 3a: Date to Duration (scale change)
+df["club_duration"] = 2024 - df["club_join_date"]
+df.drop("club_join_date", axis=1, inplace=True)
+
+# 3b: Log transform (reduce skewness)
+print("Skewness before:", df["placement"].skew())
+df["placement_log"] = np.log(df["placement"])
+print("Skewness after :", df["placement_log"].skew())
+
+fig, ax = plt.subplots(1, 2, figsize=(10,4))
+ax[0].hist(df["placement"],     bins=8, color="skyblue");    ax[0].set_title("Original")
+ax[1].hist(df["placement_log"], bins=8, color="lightgreen"); ax[1].set_title("Log Transform")
+plt.show()
+
+print(df.head())
+df.to_csv("cleaned.csv", index=False)
+print("Done!")

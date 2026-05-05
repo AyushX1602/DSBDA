@@ -1,0 +1,89 @@
+# ASSIGNMENT 2 - DATA WRANGLING II
+# Dataset: Academic Performance (Created from Scratch)
+
+# STEP 1: Import Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# STEP 2: Create Dataset (30 students, like Excel RANDBETWEEN)
+np.random.seed(42)
+n = 30
+ps = np.random.randint(75, 101, n)
+df = pd.DataFrame({
+    "Math_Score":            np.random.randint(60,  81, n),
+    "Reading_Score":         np.random.randint(75,  96, n),
+    "Writing_Score":         np.random.randint(60,  81, n),
+    "Placement_Score":       ps,
+    "Club_Join_Date":        np.random.randint(2018, 2022, n),
+    "Placement_Offer_Count": [1 if s<80 else 2 if s<=85 else 3 for s in ps]
+})
+
+# STEP 3: Add 20% Impurities
+df.loc[0, "Math_Score"] = 95;   df.loc[1, "Math_Score"] = np.nan
+df.loc[2, "Reading_Score"] = 110; df.loc[3, "Writing_Score"] = np.nan
+df.loc[4, "Placement_Score"] = 130; df.loc[5, "Placement_Offer_Count"] = 8
+df.to_csv("StudentsPerformance.csv", index=False)
+print("Dataset created!\n", df.head(8))
+
+# ── TASK 1: Missing Values & Inconsistencies ──────────────────────────────────
+print("\nMissing values:\n", df.isnull().sum())
+
+# Fix missing with median
+for col in ["Math_Score", "Reading_Score", "Writing_Score", "Placement_Score"]:
+    df[col] = df[col].fillna(df[col].median())
+
+# Fix inconsistencies with clip
+ranges = {"Math_Score":(60,80), "Reading_Score":(75,95), "Writing_Score":(60,80),
+          "Placement_Score":(75,100), "Club_Join_Date":(2018,2021), "Placement_Offer_Count":(1,3)}
+for col, (lo, hi) in ranges.items():
+    df[col] = df[col].clip(lo, hi)
+
+print("After fix:\n", df.isnull().sum())
+
+# ── TASK 2: Outliers ──────────────────────────────────────────────────────────
+num_cols = ["Math_Score", "Reading_Score", "Writing_Score",
+            "Placement_Score", "Placement_Offer_Count"]
+
+# Boxplot
+df[num_cols].boxplot(); plt.title("Boxplot"); plt.show()
+
+# IQR Detection + Fix
+for col in num_cols:
+    Q1, Q3 = df[col].quantile(0.25), df[col].quantile(0.75)
+    IQR = Q3 - Q1
+    lo, hi = Q1 - 1.5*IQR, Q3 + 1.5*IQR
+    med = df[col].median()
+    out = ((df[col]<lo)|(df[col]>hi)).sum()
+    df[col] = df[col].apply(lambda x: med if x<lo or x>hi else x)
+    print(f"{col}: {out} outlier(s) replaced | IQR={IQR}, Lower={lo:.1f}, Upper={hi:.1f}")
+
+# Z-Score Detection
+print("\nZ-Score outliers (threshold=2):")
+for col in num_cols:
+    print(f"  {col}: {(np.abs(stats.zscore(df[col]))>2).sum()} outlier(s)")
+
+# ── TASK 3: Data Transformation ───────────────────────────────────────────────
+
+# 3a: Club_Join_Date -> Club_Duration
+# Purpose: Change scale for better understanding
+df["Club_Duration"] = 2024 - df["Club_Join_Date"]
+df.drop("Club_Join_Date", axis=1, inplace=True)
+print("\nClub_Duration:", df["Club_Duration"].values)
+
+# 3b: Log Transformation on Placement_Score
+# Purpose: Reduce skewness -> normal distribution
+print(f"\nSkewness before: {df['Placement_Score'].skew():.3f}")
+df["Placement_Score_Log"] = np.log(df["Placement_Score"])
+print(f"Skewness after : {df['Placement_Score_Log'].skew():.3f}")
+
+# Plot
+fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+ax[0].hist(df["Placement_Score"],     bins=8, color="skyblue");   ax[0].set_title("Original")
+ax[1].hist(df["Placement_Score_Log"], bins=8, color="lightgreen"); ax[1].set_title("Log Transform")
+plt.tight_layout(); plt.show()
+
+print("\nFinal shape:", df.shape)
+df.to_csv("StudentsPerformance_Cleaned.csv", index=False)
+print("Done!")

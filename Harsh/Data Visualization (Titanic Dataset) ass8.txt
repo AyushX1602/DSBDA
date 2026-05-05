@@ -1,0 +1,39 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = sns.load_dataset('titanic')
+
+# Basic check
+print(df.head())
+
+# -------------------------------
+# Histogram (Fare)
+# -------------------------------
+plt.hist(df['fare'], bins=20)
+plt.title("Fare Distribution")
+plt.xlabel("Fare")
+plt.ylabel("Count")
+plt.show()
+
+# -------------------------------
+# Count Plot (Gender vs Survival)
+# -------------------------------
+sns.countplot(x='sex', hue='survived', data=df)
+plt.title("Survival by Gender")
+plt.show()
+
+# -------------------------------
+# Count Plot (Class vs Survival)
+# -------------------------------
+sns.countplot(x='pclass', hue='survived', data=df)
+plt.title("Survival by Class")
+plt.show()
+
+# -------------------------------
+# Age Distribution
+# -------------------------------
+sns.histplot(df['age'], bins=20, kde=True)
+plt.title("Age Distribution")
+plt.show()

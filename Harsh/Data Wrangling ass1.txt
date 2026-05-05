@@ -1,0 +1,24 @@
+import pandas as pd
+import numpy as np
+
+# Load dataset
+df = pd.read_csv('your_dataset.csv')
+
+# View data
+print(df.head())
+
+# Check structure
+print(df.shape)
+print(df.dtypes)
+
+# Missing values
+print(df.isnull().sum())
+
+# Fill missing values (numeric only)
+df.fillna(df.mean(numeric_only=True), inplace=True)
+
+# Remove duplicates
+df.drop_duplicates(inplace=True)
+
+# Summary
+print(df.describe())

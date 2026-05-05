@@ -1,0 +1,33 @@
+# ASSIGNMENT 3 - Descriptive Statistics | Dataset: Iris
+
+import pandas as pd
+import numpy as np
+
+# Load Dataset
+df = pd.read_csv('iris.csv')
+df.columns = ['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width','Species']
+df['Species'] = 'Iris-' + df['Species']  # setosa -> Iris-setosa
+
+print(df.head()); print(df.shape); print(df.dtypes)
+
+# TASK 1: Summary Statistics grouped by Species
+numeric_cols = ['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width']
+
+print("\nUnique Species:", df['Species'].unique())
+print("\nGrouped Mean:\n", df.groupby('Species')[numeric_cols].mean())
+print("\nFull Grouped Stats:\n", df.groupby('Species')[numeric_cols].agg(['mean','median','min','max','std']))
+
+# Numeric list per species (PS requirement)
+for sp in df['Species'].unique():
+    print(f"\n{sp} values:", df[df['Species']==sp][numeric_cols].values.tolist()[:2])
+
+# TASK 2: Per-Species Stats (describe + percentile)
+for sp in ['Iris-setosa','Iris-versicolor','Iris-virginica']:
+    subset = df[df['Species']==sp]
+    print(f"\n{'='*45}\n{sp} | Count: {len(subset)}")
+    print(subset[numeric_cols].describe())
+    print("10th percentile:\n", subset[numeric_cols].quantile(0.10))
+    print("90th percentile:\n", subset[numeric_cols].quantile(0.90))
+
+df.to_csv("iris_cleaned.csv", index=False)
+print("\nDone!")

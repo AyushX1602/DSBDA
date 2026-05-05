@@ -1,0 +1,51 @@
+%%writefile input.txt
+hello world hello hadoop data world hello big data
+big data analytics hadoop world
+
+
+%%writefile WordCount.java
+import java.io.*;
+import java.util.*;
+
+public class WordCount {
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new FileReader("input.txt"));
+
+        HashMap<String, Integer> map = new HashMap<>();
+
+        String line;
+
+        while ((line = br.readLine()) != null) {
+
+            String[] words = line.split(" ");
+
+            for (String word : words) {
+
+                word = word.toLowerCase();
+
+                if (map.containsKey(word)) {
+                    map.put(word, map.get(word) + 1);
+                } else {
+                    map.put(word, 1);
+                }
+            }
+        }
+
+        br.close();
+
+        System.out.println("Word Count Result:\n");
+
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+    }
+}
+
+
+
+!javac WordCount.java
+
+
+
+!java WordCount

@@ -1,0 +1,54 @@
+%%writefile log.txt
+INFO User login
+ERROR Disk failure
+INFO File saved
+WARNING Low battery
+ERROR Memory full
+INFO System start
+INFO User logout
+ERROR Network issue
+
+
+
+%%writefile LogAnalysis.java
+import java.io.*;
+import java.util.*;
+
+public class LogAnalysis {
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new FileReader("log.txt"));
+
+        HashMap<String, Integer> map = new HashMap<>();
+
+        String line;
+
+        while ((line = br.readLine()) != null) {
+
+            String[] parts = line.split(" ");
+
+            String key = parts[0];   // INFO, ERROR, WARNING
+
+            if (map.containsKey(key)) {
+                map.put(key, map.get(key) + 1);
+            } else {
+                map.put(key, 1);
+            }
+        }
+
+        br.close();
+
+        System.out.println("Log Analysis Result:\n");
+
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+    }
+}
+
+
+
+!javac LogAnalysis.java
+
+
+!java LogAnalysis

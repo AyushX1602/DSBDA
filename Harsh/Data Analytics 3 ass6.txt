@@ -1,0 +1,49 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+# 1. Load Dataset
+df = pd.read_csv("iris.csv")
+
+print("First 5 rows:\n", df.head())
+print("\nColumns:\n", df.columns)
+
+# 2. Convert Categorical to Numeric
+df[df.columns[-1]] = df[df.columns[-1]].astype('category').cat.codes
+
+
+# 3. Split Data into X and y
+X = df.iloc[:, :-1]   # all columns except last
+y = df.iloc[:, -1]    # last column (target)
+
+
+# 4. Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+
+# 5. Train Model (Naïve Bayes)
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+
+# 6. Prediction
+
+y_pred = model.predict(X_test)
+
+
+# 7. Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:\n", cm)
+
+
+# 8. Metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='macro')
+recall = recall_score(y_test, y_pred, average='macro')
+error_rate = 1 - accuracy
+
+print("\nAccuracy:", accuracy)
+print("Error Rate:", error_rate)
+print("Precision:", precision)
+print("Recall:", recall)

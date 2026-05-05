@@ -1,0 +1,50 @@
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+# Download once
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+# Sample text
+text = "I am learning data science and I love data analytics"
+
+# 1. Tokenization
+tokens = word_tokenize(text)
+print("Tokens:", tokens)
+
+# 2. Stopwords removal
+stop_words = set(stopwords.words('english'))
+filtered = [word for word in tokens if word.lower() not in stop_words]
+print("After Stopwords:", filtered)
+
+# 3. Stemming
+stemmer = PorterStemmer()
+stemmed = [stemmer.stem(word) for word in filtered]
+print("Stemming:", stemmed)
+
+# 4. Lemmatization
+lemmatizer = WordNetLemmatizer()
+lemmatized = [lemmatizer.lemmatize(word) for word in filtered]
+print("Lemmatization:", lemmatized)
+
+
+
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Sample documents
+docs = [
+    "I love data science",
+    "Data science is amazing",
+    "I love learning"
+]
+
+# Create TF-IDF
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(docs)
+
+print("Feature Names:", vectorizer.get_feature_names_out())
+print("TF-IDF Matrix:\n", X.toarray())

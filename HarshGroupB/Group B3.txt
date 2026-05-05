@@ -1,0 +1,59 @@
+%%writefile sample_weather.txt
+01-01 30 20 10
+02-01 32 22 12
+03-01 28 18 8
+04-01 35 25 15
+05-01 31 21 11
+06-01 29 19 9
+07-01 33 23 13
+
+
+
+%%writefile WeatherAnalysis.java
+import java.io.*;
+import java.util.*;
+
+public class WeatherAnalysis {
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new FileReader("sample_weather.txt"));
+
+        String line;
+
+        double tempSum = 0, dewSum = 0, windSum = 0;
+        int count = 0;
+
+        while ((line = br.readLine()) != null) {
+
+            String[] data = line.split(" ");
+
+            double temp = Double.parseDouble(data[1]);
+            double dew = Double.parseDouble(data[2]);
+            double wind = Double.parseDouble(data[3]);
+
+            tempSum += temp;
+            dewSum += dew;
+            windSum += wind;
+
+            count++;
+        }
+
+        br.close();
+
+        double avgTemp = tempSum / count;
+        double avgDew = dewSum / count;
+        double avgWind = windSum / count;
+
+        System.out.println("Weather Analysis Result:\n");
+        System.out.println("Average Temperature : " + avgTemp);
+        System.out.println("Average Dew Point   : " + avgDew);
+        System.out.println("Average Wind Speed  : " + avgWind);
+    }
+}
+
+
+
+!javac WeatherAnalysis.java
+
+
+!java WeatherAnalysis

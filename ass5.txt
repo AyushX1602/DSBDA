@@ -1,0 +1,22 @@
+# ASSIGNMENT 5 - Logistic Regression | Dataset: Social_Network_Ads.csv
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+
+df = pd.read_csv('Social_Network_Ads.csv')
+X, y = df[['Age','EstimatedSalary']], df['Purchased']
+
+X_train,X_test,y_train,y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model = LogisticRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+TN,FP,FN,TP = confusion_matrix(y_test, y_pred).ravel()
+print(f"Confusion Matrix:\n{confusion_matrix(y_test,y_pred)}")
+print(f"TP:{TP} FP:{FP} TN:{TN} FN:{FN}")
+print(f"Accuracy  : {(TP+TN)/(TP+TN+FP+FN):.2f}")
+print(f"Error Rate: {(FP+FN)/(TP+TN+FP+FN):.2f}")
+print(f"Precision : {TP/(TP+FP):.2f}")
+print(f"Recall    : {TP/(TP+FN):.2f}")
